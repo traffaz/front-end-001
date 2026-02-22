@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Contactez-nous</title>
+  <title>Contact Us</title>
 
   <style>
     :root{
@@ -19,7 +19,9 @@
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 14px;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -33,10 +35,14 @@
       justify-content:center;
       padding:24px;
     }
+
     .wrap{ width:min(860px, 100%); }
+
     .header{ margin-bottom:16px; }
+
     .header h1{ margin:0 0 6px; font-size:28px; }
-    .header p{ margin:0; color:var(--muted); line-height:1.45; }
+
+    .header p{ margin:0; color:var(--muted); }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
@@ -45,6 +51,7 @@
       border-radius: var(--radius);
       overflow:hidden;
     }
+
     .card-body{ padding:18px; }
 
     form{
@@ -52,45 +59,49 @@
       grid-template-columns: 1fr 1fr;
       gap:14px;
     }
+
     .field{ display:flex; flex-direction:column; gap:8px; }
+
     label{ font-size:13px; color:var(--muted); }
+
     input, textarea, select{
       width:100%;
-      padding:12px 12px;
+      padding:12px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(10,16,30,.55);
       color:var(--text);
       outline:none;
     }
+
     input:focus, textarea:focus, select:focus{
       border-color: rgba(79,140,255,.7);
     }
+
     textarea{ min-height:120px; resize:vertical; }
+
     .full{ grid-column: 1 / -1; }
 
     .actions{
       grid-column: 1 / -1;
       display:flex;
       gap:10px;
-      align-items:center;
       justify-content:flex-end;
       margin-top:6px;
     }
+
     button{
       border:0;
-      border-radius: 12px;
+      border-radius:12px;
       padding:12px 14px;
       font-weight:700;
       cursor:pointer;
-      color: white;
+      color:white;
       background: linear-gradient(180deg, var(--primary), var(--primary2));
-      transition: opacity .15s ease;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
     }
+
     button:disabled{ opacity:.6; cursor:not-allowed; }
+
     .secondary{
       background: transparent;
       border:1px solid rgba(255,255,255,.18);
@@ -100,31 +111,29 @@
 
     .status{
       grid-column: 1 / -1;
-      border-radius: 12px;
+      border-radius:12px;
       padding:12px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(17,26,45,.55);
-      color: var(--muted);
       display:none;
       white-space: pre-wrap;
     }
+
     .status.ok{
       display:block;
       border-color: rgba(41,211,145,.35);
       color: rgba(210,255,238,.95);
     }
+
     .status.err{
       display:block;
       border-color: rgba(255,79,109,.45);
       color: rgba(255,210,219,.95);
     }
 
-    .hint{ font-size:12px; color:var(--muted); margin-top:-4px; }
-
     @media (max-width: 720px){
       form{ grid-template-columns: 1fr; }
-      .actions{ justify-content:stretch; }
-      button{ width:100%; justify-content:center; }
+      button{ width:100%; }
     }
   </style>
 </head>
@@ -132,121 +141,106 @@
 <body>
   <div class="wrap">
     <div class="header">
-      <h1>Contactez-nous</h1>
-      <p>Ajoute une criticité et envoie les données à ta Logic App via HTTP POST.</p>
+      <h1>Contact Us</h1>
+      <p>Submit your request and select the appropriate criticity level.</p>
     </div>
 
     <div class="card">
       <div class="card-body">
         <form id="contactForm" novalidate>
+
           <div class="field">
-            <label for="nom">Nom</label>
-            <input id="nom" name="nom" type="text" autocomplete="name" required />
+            <label for="name">Name</label>
+            <input id="name" type="text" required />
           </div>
 
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" required />
+            <input id="email" type="email" required />
           </div>
 
           <div class="field full">
-            <label for="sujet">Sujet</label>
-            <input id="sujet" name="sujet" type="text" required />
+            <label for="subject">Subject</label>
+            <input id="subject" type="text" required />
           </div>
 
           <div class="field">
-            <label for="criticite">Criticité</label>
-            <select id="criticite" name="criticite" required>
-              <option value="" selected disabled>Choisir…</option>
-              <option value="Faible">Faible</option>
-              <option value="Moyenne">Moyenne</option>
-              <option value="Élevée">Élevée</option>
-              <option value="Critique">Critique</option>
+            <label for="criticity">Criticity</label>
+            <select id="criticity" required>
+              <option value="" disabled selected>Select...</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
             </select>
-            <div class="hint">“Critique” si incident bloquant / production.</div>
           </div>
 
           <div class="field">
-            <label for="telephone">Téléphone (optionnel)</label>
-            <input id="telephone" name="telephone" type="tel" autocomplete="tel" />
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" type="tel" />
           </div>
 
           <div class="field full">
             <label for="message">Message</label>
-            <textarea id="message" name="message" required></textarea>
+            <textarea id="message" required></textarea>
           </div>
 
           <div id="status" class="status"></div>
 
           <div class="actions">
-            <button type="button" class="secondary" id="resetBtn">Réinitialiser</button>
-            <button type="submit" id="sendBtn">
-              <span id="sendLabel">Envoyez</span>
-              <span id="spinner" style="display:none;">⏳</span>
-            </button>
+            <button type="button" class="secondary" id="resetBtn">Reset</button>
+            <button type="submit" id="sendBtn">Send</button>
           </div>
+
         </form>
       </div>
     </div>
   </div>
 
   <script>
-    // ⚠️ IMPORTANT : cette URL contient un "sig" (secret). Ne pas la mettre dans un repo public.
-    const LOGIC_APP_URL = "https://prod-03.westeurope.logic.azure.com:443/workflows/791bf1b2e04a421ea1f18cc07174b408/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=pBZrXsGJSHff5wL7spta5tPVYeIhWePjFkCEIUymu5s";
+    const LOGIC_APP_URL = "YOUR_LOGIC_APP_URL_HERE";
 
     const form = document.getElementById("contactForm");
     const statusEl = document.getElementById("status");
-    const sendBtn = document.getElementById("sendBtn");
-    const sendLabel = document.getElementById("sendLabel");
-    const spinner = document.getElementById("spinner");
-    const resetBtn = document.getElementById("resetBtn");
 
     function setStatus(type, message){
       statusEl.className = "status " + (type || "");
-      statusEl.textContent = message || "";
+      statusEl.textContent = message;
       statusEl.style.display = message ? "block" : "none";
-    }
-
-    function setLoading(isLoading){
-      sendBtn.disabled = isLoading;
-      spinner.style.display = isLoading ? "inline" : "none";
-      sendLabel.textContent = isLoading ? "Envoi…" : "Envoyez";
     }
 
     function getFormData(){
       return {
-        nom: document.getElementById("nom").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        sujet: document.getElementById("sujet").value.trim(),
-        criticite: document.getElementById("criticite").value,
-        telephone: document.getElementById("telephone").value.trim(),
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.replace(/\s+/g, "").trim(),
+        subject: document.getElementById("subject").value.trim(),
+        criticity: document.getElementById("criticity").value,
+        phone: document.getElementById("phone").value.trim(),
         message: document.getElementById("message").value.trim(),
-        sentAt: new Date().toISOString(),
-        source: "contactez-nous"
+        sentAt: new Date().toISOString()
       };
     }
 
     function validate(data){
-      if(!data.nom) return "Le champ Nom est requis.";
-      if(!data.email) return "Le champ Email est requis.";
-      if(!data.sujet) return "Le champ Sujet est requis.";
-      if(!data.criticite) return "Le champ Criticité est requis.";
-      if(!data.message) return "Le champ Message est requis.";
+      if(!data.name) return "Name is required.";
+      if(!data.email) return "Email is required.";
+      if(!document.getElementById("email").checkValidity()) return "Invalid email address.";
+      if(!data.subject) return "Subject is required.";
+      if(!data.criticity) return "Criticity is required.";
+      if(!data.message) return "Message is required.";
       return null;
     }
 
     async function sendToLogicApp(payload){
-      const res = await fetch(LOGIC_APP_URL, {
+      const response = await fetch(LOGIC_APP_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      const text = await res.text().catch(() => "");
-      if(!res.ok){
-        throw new Error(`Erreur HTTP ${res.status}\\n${text || "Réponse vide"}`);
+      if(!response.ok){
+        throw new Error("HTTP Error " + response.status);
       }
-      return text;
     }
 
     form.addEventListener("submit", async (e) => {
@@ -254,37 +248,23 @@
       setStatus("", "");
 
       const data = getFormData();
-      const err = validate(data);
-      if(err){
-        setStatus("err", err);
+      const error = validate(data);
+
+      if(error){
+        setStatus("err", error);
         return;
       }
 
-      // ✅ Payload JSON envoyé (À ADAPTER selon ton schéma exact "étape 3.a")
-      const payload = {
-        nom: data.nom,
-        email: data.email,
-        sujet: data.sujet,
-        criticite: data.criticite,
-        telephone: data.telephone || null,
-        message: data.message,
-        sentAt: data.sentAt,
-        source: data.source
-      };
-
       try{
-        setLoading(true);
-        const resp = await sendToLogicApp(payload);
-        setStatus("ok", "Message envoyé avec succès.\n" + (resp ? ("Réponse: " + resp) : ""));
+        await sendToLogicApp(data);
+        setStatus("ok", "Message sent successfully.");
         form.reset();
-      }catch(ex){
-        setStatus("err", ex?.message || "Erreur lors de l’envoi.");
-      }finally{
-        setLoading(false);
+      }catch(err){
+        setStatus("err", "An error occurred while sending the message.");
       }
     });
 
-    resetBtn.addEventListener("click", () => {
+    document.getElementById("resetBtn").addEventListener("click", () => {
       form.reset();
       setStatus("", "");
     });
