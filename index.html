@@ -229,7 +229,6 @@
     function validate(data){
       if(!data.nom) return "Le champ Nom est requis.";
       if(!data.email) return "Le champ Email est requis.";
-      if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(data.email)) return "Email invalide.";
       if(!data.sujet) return "Le champ Sujet est requis.";
       if(!data.criticite) return "Le champ Criticité est requis.";
       if(!data.message) return "Le champ Message est requis.";
