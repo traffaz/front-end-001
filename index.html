@@ -39,10 +39,8 @@
     .wrap{ width:min(860px, 100%); }
 
     .header{ margin-bottom:16px; }
-
     .header h1{ margin:0 0 6px; font-size:28px; }
-
-    .header p{ margin:0; color:var(--muted); }
+    .header p{ margin:0; color:var(--muted); line-height:1.45; }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
@@ -51,7 +49,6 @@
       border-radius: var(--radius);
       overflow:hidden;
     }
-
     .card-body{ padding:18px; }
 
     form{
@@ -61,7 +58,6 @@
     }
 
     .field{ display:flex; flex-direction:column; gap:8px; }
-
     label{ font-size:13px; color:var(--muted); }
 
     input, textarea, select{
@@ -72,6 +68,7 @@
       background: rgba(10,16,30,.55);
       color:var(--text);
       outline:none;
+      transition: border-color .15s ease;
     }
 
     input:focus, textarea:focus, select:focus{
@@ -79,13 +76,13 @@
     }
 
     textarea{ min-height:120px; resize:vertical; }
-
     .full{ grid-column: 1 / -1; }
 
     .actions{
       grid-column: 1 / -1;
       display:flex;
       gap:10px;
+      align-items:center;
       justify-content:flex-end;
       margin-top:6px;
     }
@@ -98,8 +95,13 @@
       cursor:pointer;
       color:white;
       background: linear-gradient(180deg, var(--primary), var(--primary2));
+      transition: opacity .15s ease, transform .05s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
     }
 
+    button:active{ transform: translateY(1px); }
     button:disabled{ opacity:.6; cursor:not-allowed; }
 
     .secondary{
@@ -117,6 +119,7 @@
       background: rgba(17,26,45,.55);
       display:none;
       white-space: pre-wrap;
+      color: var(--muted);
     }
 
     .status.ok{
@@ -131,9 +134,16 @@
       color: rgba(255,210,219,.95);
     }
 
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:-4px;
+    }
+
     @media (max-width: 720px){
       form{ grid-template-columns: 1fr; }
-      button{ width:100%; }
+      .actions{ justify-content:stretch; }
+      button{ width:100%; justify-content:center; }
     }
   </style>
 </head>
@@ -142,21 +152,20 @@
   <div class="wrap">
     <div class="header">
       <h1>Contact Us</h1>
-      <p>Submit your request and select the appropriate criticity level.</p>
+      <p>Please fill out the form below and choose the appropriate <b>criticity</b> level.</p>
     </div>
 
     <div class="card">
       <div class="card-body">
         <form id="contactForm" novalidate>
-
           <div class="field">
             <label for="name">Name</label>
-            <input id="name" type="text" required />
+            <input id="name" type="text" autocomplete="name" required />
           </div>
 
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" type="email" required />
+            <input id="email" type="email" autocomplete="email" required />
           </div>
 
           <div class="field full">
@@ -173,11 +182,12 @@
               <option value="High">High</option>
               <option value="Critical">Critical</option>
             </select>
+            <div class="hint">Use “Critical” for production-blocking incidents.</div>
           </div>
 
           <div class="field">
             <label for="phone">Phone (optional)</label>
-            <input id="phone" type="tel" />
+            <input id="phone" type="tel" autocomplete="tel" />
           </div>
 
           <div class="field full">
@@ -189,42 +199,63 @@
 
           <div class="actions">
             <button type="button" class="secondary" id="resetBtn">Reset</button>
-            <button type="submit" id="sendBtn">Send</button>
+            <button type="submit" id="sendBtn">
+              <span id="sendLabel">Send</span>
+              <span id="spinner" style="display:none;">⏳</span>
+            </button>
           </div>
-
         </form>
       </div>
     </div>
   </div>
 
   <script>
-    const LOGIC_APP_URL = "YOUR_LOGIC_APP_URL_HERE";
+    // ⚠️ Contains a secret signature (sig=...). Avoid publishing publicly.
+    const LOGIC_APP_URL = "https://prod-03.westeurope.logic.azure.com:443/workflows/791bf1b2e04a421ea1f18cc07174b408/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=pBZrXsGJSHff5wL7spta5tPVYeIhWePjFkCEIUymu5s";
 
     const form = document.getElementById("contactForm");
     const statusEl = document.getElementById("status");
+    const sendBtn = document.getElementById("sendBtn");
+    const sendLabel = document.getElementById("sendLabel");
+    const spinner = document.getElementById("spinner");
+    const resetBtn = document.getElementById("resetBtn");
 
     function setStatus(type, message){
       statusEl.className = "status " + (type || "");
-      statusEl.textContent = message;
+      statusEl.textContent = message || "";
       statusEl.style.display = message ? "block" : "none";
     }
 
+    function setLoading(isLoading){
+      sendBtn.disabled = isLoading;
+      spinner.style.display = isLoading ? "inline" : "none";
+      sendLabel.textContent = isLoading ? "Sending..." : "Send";
+    }
+
     function getFormData(){
+      const emailRaw = document.getElementById("email").value;
+      const email = emailRaw.replace(/\s+/g, "").trim(); // robust cleanup
+
       return {
         name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.replace(/\s+/g, "").trim(),
+        email,
         subject: document.getElementById("subject").value.trim(),
         criticity: document.getElementById("criticity").value,
         phone: document.getElementById("phone").value.trim(),
         message: document.getElementById("message").value.trim(),
-        sentAt: new Date().toISOString()
+        sentAt: new Date().toISOString(),
+        source: "contact-us"
       };
     }
 
     function validate(data){
       if(!data.name) return "Name is required.";
       if(!data.email) return "Email is required.";
-      if(!document.getElementById("email").checkValidity()) return "Invalid email address.";
+
+      const emailInput = document.getElementById("email");
+      // Use native HTML validation for best compatibility
+      if(!emailInput.checkValidity()) return "Invalid email address.";
+
       if(!data.subject) return "Subject is required.";
       if(!data.criticity) return "Criticity is required.";
       if(!data.message) return "Message is required.";
@@ -232,15 +263,17 @@
     }
 
     async function sendToLogicApp(payload){
-      const response = await fetch(LOGIC_APP_URL, {
+      const res = await fetch(LOGIC_APP_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      if(!response.ok){
-        throw new Error("HTTP Error " + response.status);
+      const text = await res.text().catch(() => "");
+      if(!res.ok){
+        throw new Error(`HTTP ${res.status}\n${text || "Empty response"}`);
       }
+      return text;
     }
 
     form.addEventListener("submit", async (e) => {
@@ -248,23 +281,38 @@
       setStatus("", "");
 
       const data = getFormData();
-      const error = validate(data);
-
-      if(error){
-        setStatus("err", error);
+      const err = validate(data);
+      if(err){
+        setStatus("err", err);
         return;
       }
 
+      // ✅ Payload sent to Logic App
+      // If your Logic App expects a different JSON structure, tell me your schema and I'll map it exactly.
+      const payload = {
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        criticity: data.criticity,
+        phone: data.phone || null,
+        message: data.message,
+        sentAt: data.sentAt,
+        source: data.source
+      };
+
       try{
-        await sendToLogicApp(data);
+        setLoading(true);
+        await sendToLogicApp(payload);
         setStatus("ok", "Message sent successfully.");
         form.reset();
-      }catch(err){
-        setStatus("err", "An error occurred while sending the message.");
+      }catch(ex){
+        setStatus("err", ex?.message || "An error occurred while sending.");
+      }finally{
+        setLoading(false);
       }
     });
 
-    document.getElementById("resetBtn").addEventListener("click", () => {
+    resetBtn.addEventListener("click", () => {
       form.reset();
       setStatus("", "");
     });
